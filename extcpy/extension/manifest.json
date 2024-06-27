@@ -1,0 +1,25 @@
+{
+  "manifest_version": 2,
+  "name": "Phishing Detection Extension",
+  "version": "1.0",
+  "description": "Alerts users about potential phishing URLs.",
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking",
+    "tabs",
+    "*://*/*"
+  ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "icons": {
+    "48": "icon.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*/*"],
+      "js": ["content.js"]
+    }
+  ]
+}
