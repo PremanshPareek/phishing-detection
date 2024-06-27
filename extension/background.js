@@ -1,45 +1,26 @@
-browser.runtime.onMessage.addListener(async (message) => {
-  if (message.action === 'checkContent') {
-    const { username, email_message, url } = message.data;
-    const response = await sendRequestToBackend(username, email_message, url);
+async function checkUrl(url) {
+  const response = await fetch('http://localhost:5000/check-url', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ url: url })
+  });
+  const data = await response.json();
+  return data.is_phishing;
+}
 
-    if (response.is_phishing) {
-      if (message.type === 'email') {
-        alert(`Phishing email detected!\n\nURL: ${url}`);
-      } else if (message.type === 'url') {
-        const warningUrl = browser.runtime.getURL("intermediatepage.html") + `?url=${encodeURIComponent(url)}`;
-        browser.tabs.update({ url: warningUrl });
+browser.webRequest.onBeforeRequest.addListener(
+  async (details) => {
+    if (details.type === "main_frame") {
+      const isPhishing = await checkUrl(details.url);
+      if (isPhishing) {
+        browser.tabs.create({
+          url: browser.extension.getURL("popup.html")
+        });
       }
     }
-  }
-});
-
-async function sendRequestToBackend(username, emailMessage, url) {
-  const apiUrl = 'https://your-backend-api-url'; // Replace with your actual backend API URL
-
-  try {
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username: username,
-        email_message: emailMessage,
-        url: url
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    const responseData = await response.json();
-    console.log('Backend Response:', responseData);
-
-    return responseData;
-  } catch (error) {
-    console.error('Error sending request to backend:', error);
-    return { error: true, message: 'Error sending request to backend' };
-  }
-}
+  },
+  { urls: ["<all_urls>"] },
+  ["blocking"]
+);

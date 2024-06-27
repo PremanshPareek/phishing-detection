@@ -1,17 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Phishing Extension</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 10px;
-    }
-  </style>
+  <title>Phishing Warning</title>
+  <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
-  <h1>Phishing Extension</h1>
-  <p>Extension is active and protecting you from phishing attacks.</p>
+  <div class="warning">
+    <h1>Warning: Potential Phishing Attempt!</h1>
+    <p>The page you are trying to visit may be a phishing site.</p>
+    <button id="goBack">Go Back</button>
+    <button id="proceed">Proceed Anyway</button>
+  </div>
+  <script src="popup.js"></script>
 </body>
 </html>
