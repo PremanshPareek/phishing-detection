@@ -20,16 +20,15 @@ def check_url():
 
 
     is_phishing = True
-    M = UrlAnalysis
+    M = UrlAnalysis()
     if url:
-        if M.is_phishing(url):
-            is_phishing = True
-            insert_detection_result(username, url, True)
+        is_phishing = M.is_phishing(url=url)
 
     response = {
         'is_phishing': is_phishing
     }
     print(response)
+    print(url)
     return jsonify(response)
 
 @app.route('/check-email', methods=['POST'])
@@ -37,23 +36,14 @@ def check_email():
 
     data = request.get_json()
     email_message = data.get('email_message')
-    url = data.get('url')
-    username = data.get('username')
     # Check if all required fields are present
-    if not username:
-        abort(400, description="Bad Request: Missing required fields (username, email_message, url)")
+    M = EmailDetection()
+    is_phishing = M.is_phishing(url)
 
-
-
-    is_phishing_ = True
-    M = EmailDetection
-    if email_message:
-        if M.is_phishing(url):
-            is_phishing = True
-
+    print(email_message)
+    print(response)
     response = {
-        'is_phishing': is_phishing_,
-        'success': True
+        'is_phishing': is_phishing,
     }
 
     return jsonify(response)
