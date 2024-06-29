@@ -1,48 +1,58 @@
 from flask import Flask, request, jsonify, abort
-from database import initialize_database, insert_detection_result
-from ML.EmailDetection import EmailDetection
-from ML.UrlAnalysis import UrlAnalysis
+from database.database import initialize_database, insert_detection_result
+from ML.EmailDetection.EmailDetection import EmailDetection
+from ML.UrlAnalysis.UrlAnalysis import UrlAnalysis
 
 app = Flask(__name__)
 
     # Initialize the database
 initialize_database()
 
-@app.route('/check', methods=['POST'])
-def check():
+@app.route('/check-url', methods=['POST'])
+def check_url():
 
     data = request.get_json()
     email_message = data.get('email_message')
     url = data.get('url')
     username = data.get('username')
     # Check if all required fields are present
-    if not username:
-        abort(400, description="Bad Request: Missing required fields (username, email_message, url)")
 
-    is_phishing = False
 
-        # Perform URL phishing analysis
+
+    is_phishing = True
+    M = UrlAnalysis()
     if url:
-        if UrlAnalysis.is_phishing(url):
-            is_phishing = True
-            insert_detection_result(username, url, True)
-            
-    if email_message:
-        # Perform email phishing analysis
-        if EmailDetection.is_phishing(email_message):
-            is_phishing = True
-            insert_detection_result(username, 'Email message', True)
+        is_phishing = M.is_phishing(url=url)
 
     response = {
+        'is_phishing': is_phishing
+    }
+    print(response)
+    print(url)
+    return jsonify(response)
+
+@app.route('/check-email', methods=['POST'])
+def check_email():
+
+    data = request.get_json()
+    email_message = data.get('email_message')
+    # Check if all required fields are present
+    M = EmailDetection()
+    is_phishing = M.is_phishing(url)
+
+    print(email_message)
+    print(response)
+    response = {
         'is_phishing': is_phishing,
-        'success': True
     }
 
     return jsonify(response)
 
+
 # Error handler for 400 Bad Request
 @app.errorhandler(400)
 def bad_request(error):
+    print(error.description)
     return jsonify({
         'error': 'Bad Request',
         'message': error.description,
