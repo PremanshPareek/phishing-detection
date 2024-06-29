@@ -15,6 +15,7 @@ browser.webRequest.onBeforeRequest.addListener(
     if (details.type === "main_frame") {
       const isPhishing = await checkUrl(details.url);
       if (isPhishing) {
+        console.log(isPhishing)
         browser.tabs.create({
           url: browser.extension.getURL("popup.html")
         });
