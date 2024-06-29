@@ -3,7 +3,6 @@ import re
 import whois
 from datetime import datetime
 import requests
-""" import dns.resolver """
 import random
 from bs4 import BeautifulSoup
 import requests
@@ -371,10 +370,6 @@ class UrlAnalysis:
         premansh=url_features(url_temp)
         chinkal=self.rf_model.predict([premansh])
         return bool(chinkal)
-
-
-
-
 
 
 
